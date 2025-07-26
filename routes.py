@@ -158,14 +158,28 @@ def api_complete_task(task_id):
     task.completed = True
     task.progress = task.max_progress
     
-    # Add rewards
+    # Add rewards and check for level up
     player_data = user.player_data
+    old_level = player_data.level
     player_data.coins += task.coin_reward
     GameLogic.add_xp(player_data, task.xp_reward)
+    new_level = player_data.level
     
     db.session.commit()
     
-    return jsonify({'success': True, 'message': f'Task completed! +{task.xp_reward} XP, +{task.coin_reward} coins'})
+    # Check if player leveled up
+    level_up = new_level > old_level
+    
+    response_data = {
+        'success': True, 
+        'message': f'Task completed! +{task.xp_reward} XP, +{task.coin_reward} coins',
+        'level_up': level_up
+    }
+    
+    if level_up:
+        response_data['new_level'] = new_level
+    
+    return jsonify(response_data)
 
 @app.route('/api/quests')
 def api_quests():

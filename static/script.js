@@ -422,7 +422,13 @@ class Game {
             const result = await response.json();
 
             if (response.ok && result.success) {
-                this.showNotification(result.message, 'success');
+                // Check for level up and show animation
+                if (result.level_up && result.new_level) {
+                    this.showLevelUpAnimation(result.new_level);
+                    this.showNotification(`Level up! You are now Level ${result.new_level}!`, 'success');
+                } else {
+                    this.showNotification(result.message, 'success');
+                }
                 await this.loadDailyTasks();
                 await this.loadPlayer();
             } else {
@@ -697,7 +703,7 @@ class Game {
                     <div class="entry-rank ${player.position <= 3 ? 'top3' : ''}">${rankDisplay}</div>
                     <div class="entry-name">${player.name}</div>
                     <div class="entry-level">LVL ${player.level}</div>
-                    <div class="entry-position">#${player.position}</div>
+                    <div class="entry-rank-number">#${player.position}</div>
                     <div class="entry-score">${player.rank_score}</div>
                     <div class="entry-streak">${player.daily_streak}</div>
                 `;
@@ -849,6 +855,30 @@ class Game {
         setTimeout(() => {
             notification.classList.remove('show');
         }, 3000);
+    }
+
+    // Level up animation
+    showLevelUpAnimation(newLevel) {
+        const levelUpDiv = document.createElement('div');
+        levelUpDiv.className = 'level-up-animation';
+        levelUpDiv.innerHTML = `
+            <div class="level-up-content">
+                <div class="level-up-burst">💥</div>
+                <div class="level-up-text">LEVEL UP!</div>
+                <div class="level-up-number">LEVEL ${newLevel}</div>
+                <div class="level-up-effects">✨ STATS INCREASED! ✨</div>
+                <div class="level-up-glow"></div>
+            </div>
+        `;
+        
+        document.body.appendChild(levelUpDiv);
+        
+        // Remove animation after 4 seconds
+        setTimeout(() => {
+            if (levelUpDiv.parentNode) {
+                levelUpDiv.parentNode.removeChild(levelUpDiv);
+            }
+        }, 4000);
     }
 
     // Cleanup

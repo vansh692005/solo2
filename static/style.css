@@ -1256,9 +1256,10 @@ body {
     font-weight: 600;
 }
 
-.entry-rank-badge {
+.entry-rank-number {
     text-align: center;
-    font-weight: 900;
+    font-weight: 700;
+    color: #7d7de8;
     font-size: 14px;
 }
 
@@ -1400,6 +1401,107 @@ body {
 @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.7; }
+}
+
+/* Level Up Animation */
+.level-up-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: levelUpFadeIn 0.5s ease-out forwards;
+}
+
+.level-up-content {
+    text-align: center;
+    position: relative;
+    animation: levelUpContentScale 0.8s ease-out forwards;
+}
+
+.level-up-burst {
+    font-size: 80px;
+    animation: levelUpBurst 1.5s ease-out forwards;
+}
+
+.level-up-text {
+    font-size: 64px;
+    font-weight: 900;
+    color: #7d7de8;
+    text-shadow: 0 0 30px rgba(125, 125, 232, 1);
+    margin: 20px 0;
+    animation: levelUpTextGlow 2s ease-in-out infinite alternate;
+}
+
+.level-up-number {
+    font-size: 48px;
+    font-weight: 700;
+    color: #f4d03f;
+    text-shadow: 0 0 20px rgba(244, 208, 63, 0.8);
+    margin: 15px 0;
+    animation: levelUpNumberPulse 1.5s ease-in-out infinite;
+}
+
+.level-up-effects {
+    font-size: 24px;
+    color: #ffffff;
+    margin-top: 20px;
+    animation: levelUpEffects 2s ease-in-out infinite alternate;
+}
+
+.level-up-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(125, 125, 232, 0.3) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: levelUpGlow 2s ease-in-out infinite;
+    z-index: -1;
+}
+
+@keyframes levelUpFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes levelUpContentScale {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes levelUpBurst {
+    0% { transform: scale(0.2) rotate(0deg); opacity: 0; }
+    50% { transform: scale(1.5) rotate(180deg); opacity: 1; }
+    100% { transform: scale(1) rotate(360deg); opacity: 0.7; }
+}
+
+@keyframes levelUpTextGlow {
+    from { text-shadow: 0 0 30px rgba(125, 125, 232, 1); }
+    to { text-shadow: 0 0 50px rgba(125, 125, 232, 1), 0 0 80px rgba(125, 125, 232, 0.5); }
+}
+
+@keyframes levelUpNumberPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+@keyframes levelUpEffects {
+    from { opacity: 0.7; }
+    to { opacity: 1; }
+}
+
+@keyframes levelUpGlow {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.6; }
 }
 
 /* Responsive Design */
