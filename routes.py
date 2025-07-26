@@ -539,13 +539,14 @@ def api_leaderboard():
     leaderboard_data = []
     for i, player in enumerate(top_players):
         leaderboard_data.append({
-            'rank': i + 1,
+            'position': i + 1,
             'name': player.name,
             'level': player.level,
             'rank': player.rank,
             'rank_name': player.rank_name,
             'rank_score': player.rank_score,
-            'daily_streak': player.daily_streak
+            'daily_streak': player.daily_streak,
+            'is_top_three': i < 3
         })
     
     # Get current user's rank

@@ -685,10 +685,16 @@ class Game {
 
             data.leaderboard.forEach(player => {
                 const entryElement = document.createElement('div');
-                entryElement.className = `leaderboard-entry ${player.rank <= 3 ? 'top3' : ''}`;
+                entryElement.className = `leaderboard-entry ${player.position <= 3 ? 'top3' : ''}`;
+
+                // Add medal icons for top 3
+                let rankDisplay = `#${player.position}`;
+                if (player.position === 1) rankDisplay = '🥇 #1';
+                else if (player.position === 2) rankDisplay = '🥈 #2';
+                else if (player.position === 3) rankDisplay = '🥉 #3';
 
                 entryElement.innerHTML = `
-                    <div class="entry-rank ${player.rank <= 3 ? 'top3' : ''}">#${player.rank}</div>
+                    <div class="entry-rank ${player.position <= 3 ? 'top3' : ''}">${rankDisplay}</div>
                     <div class="entry-name">${player.name}</div>
                     <div class="entry-level">LVL ${player.level}</div>
                     <div class="entry-rank-badge">${player.rank}</div>
