@@ -151,6 +151,7 @@ class Achievement(db.Model):
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
     unlocked = db.Column(db.Boolean, default=False)
+    claimed = db.Column(db.Boolean, default=False)
     unlock_date = db.Column(db.DateTime)
     reward_xp = db.Column(db.Integer, default=0)
     reward_coins = db.Column(db.Integer, default=0)

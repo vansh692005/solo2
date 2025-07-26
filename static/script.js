@@ -386,7 +386,10 @@ class Game {
 
         this.achievements.forEach(achievement => {
             const achievementElement = document.createElement('div');
-            achievementElement.className = `achievement-item ${achievement.unlocked ? 'unlocked' : ''}`;
+            achievementElement.className = `achievement-item ${achievement.unlocked ? 'unlocked' : ''} ${achievement.claimed ? 'claimed' : ''}`;
+
+            const claimButton = achievement.unlocked && !achievement.claimed ? 
+                `<button class="claim-btn" onclick="game.claimAchievement(${achievement.id})">CLAIM REWARD</button>` : '';
 
             achievementElement.innerHTML = `
                 <div class="achievement-icon">🏆</div>
@@ -398,6 +401,10 @@ class Game {
                         `<div class="achievement-date">Unlocked: ${new Date(achievement.unlock_date).toLocaleDateString()}</div>` : 
                         ''
                     }
+                    ${achievement.claimed ? '<div class="claimed-status">✓ CLAIMED</div>' : ''}
+                </div>
+                <div class="achievement-actions">
+                    ${claimButton}
                 </div>
             `;
 
@@ -512,6 +519,28 @@ class Game {
         } catch (error) {
             console.error('Error using item:', error);
             this.showNotification('Failed to use item', 'error');
+        }
+    }
+
+    // Achievement claiming
+    async claimAchievement(achievementId) {
+        try {
+            const response = await fetch(`/api/claim-achievement/${achievementId}`, {
+                method: 'POST'
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                this.showNotification(result.message, 'success');
+                await this.loadAchievements();
+                await this.loadPlayer();
+            } else {
+                this.showNotification(result.error || 'Failed to claim achievement', 'error');
+            }
+        } catch (error) {
+            console.error('Error claiming achievement:', error);
+            this.showNotification('Failed to claim achievement', 'error');
         }
     }
 

@@ -8,33 +8,32 @@ class GameLogic:
     @staticmethod
     def create_default_player_data(user):
         """Create default player data for a new user"""
-        player_data = PlayerData(
-            user_id=user.id,
-            name=user.name.upper(),
-            level=1,
-            current_xp=0,
-            xp_to_next_level=100,
-            total_experience=0,
-            player_class='BEGINNER',
-            title='NEWBIE',
-            rank='E',
-            rank_name='AWAKENED',
-            rank_score=0,
-            coins=100,
-            energy=100,
-            max_energy=100,
-            strength=10,
-            vitality=10,
-            agility=10,
-            intelligence=10,
-            perception=10,
-            available_points=0,
-            physical_damage_reduction=5,
-            magical_damage_reduction=3,
-            daily_streak=0,
-            max_streak=0,
-            last_daily_reset=datetime.utcnow()
-        )
+        player_data = PlayerData()
+        player_data.user_id = user.id
+        player_data.name = user.name.upper()
+        player_data.level = 1
+        player_data.current_xp = 0
+        player_data.xp_to_next_level = 100
+        player_data.total_experience = 0
+        player_data.player_class = 'BEGINNER'
+        player_data.title = 'NEWBIE'
+        player_data.rank = 'E'
+        player_data.rank_name = 'AWAKENED'
+        player_data.rank_score = 0
+        player_data.coins = 100
+        player_data.energy = 100
+        player_data.max_energy = 100
+        player_data.strength = 10
+        player_data.vitality = 10
+        player_data.agility = 10
+        player_data.intelligence = 10
+        player_data.perception = 10
+        player_data.available_points = 0
+        player_data.physical_damage_reduction = 5
+        player_data.magical_damage_reduction = 3
+        player_data.daily_streak = 0
+        player_data.max_streak = 0
+        player_data.last_daily_reset = datetime.utcnow()
         db.session.add(player_data)
         
         # Create default quests
@@ -47,15 +46,14 @@ class GameLogic:
         ]
         
         for quest_type, max_prog, xp_reward, coin_reward in quest_types:
-            quest = Quest(
-                user_id=user.id,
-                quest_type=quest_type,
-                progress=0,
-                max_progress=max_prog,
-                completed=False,
-                xp_reward=xp_reward,
-                coin_reward=coin_reward
-            )
+            quest = Quest()
+            quest.user_id = user.id
+            quest.quest_type = quest_type
+            quest.progress = 0
+            quest.max_progress = max_prog
+            quest.completed = False
+            quest.xp_reward = xp_reward
+            quest.coin_reward = coin_reward
             db.session.add(quest)
         
         # Create default achievements
@@ -68,14 +66,13 @@ class GameLogic:
         ]
         
         for name, desc, unlocked, xp, coins in achievements:
-            achievement = Achievement(
-                user_id=user.id,
-                name=name,
-                description=desc,
-                unlocked=unlocked,
-                reward_xp=xp,
-                reward_coins=coins
-            )
+            achievement = Achievement()
+            achievement.user_id = user.id
+            achievement.name = name
+            achievement.description = desc
+            achievement.unlocked = unlocked
+            achievement.reward_xp = xp
+            achievement.reward_coins = coins
             db.session.add(achievement)
         
         db.session.commit()
@@ -83,33 +80,37 @@ class GameLogic:
     
     @staticmethod
     def create_daily_tasks(user):
-        """Create daily tasks for a user"""
+        """Create daily tasks for a user with progressive difficulty"""
         # Clear existing tasks for today
         today = datetime.utcnow().date()
         DailyTask.query.filter_by(user_id=user.id, task_date=today).delete()
         
+        # Get player streak for progressive difficulty
+        player_data = user.player_data
+        streak = player_data.daily_streak if player_data else 0
+        
+        # Calculate progressive numbers (add 2 more each day for pushups/situps)
+        pushup_count = 12 + (streak * 2)
+        situp_count = 12 + (streak * 2)
+        
+        # Fixed daily tasks with progressive difficulty
         task_templates = [
-            ('Push-ups', 100, 20, 10),
-            ('Study Time', 60, 25, 15),
-            ('Meditation', 30, 15, 8),
-            ('Reading', 45, 18, 12),
-            ('Exercise', 60, 22, 14)
+            (f'{pushup_count} PUSHUPS', pushup_count, 25, 10),
+            (f'{situp_count} SITUPS', situp_count, 25, 10),
+            ('2KM OUTDOOR RUN', 2, 50, 20),
+            ('MEDITATE 15 MIN', 15, 30, 15)
         ]
         
-        # Select 3-5 random tasks
-        selected_tasks = random.sample(task_templates, random.randint(3, 5))
-        
-        for name, max_prog, xp, coins in selected_tasks:
-            task = DailyTask(
-                user_id=user.id,
-                name=name,
-                progress=0,
-                max_progress=max_prog,
-                completed=False,
-                xp_reward=xp,
-                coin_reward=coins,
-                task_date=today
-            )
+        for name, max_prog, xp, coins in task_templates:
+            task = DailyTask()
+            task.user_id = user.id
+            task.name = name
+            task.progress = 0
+            task.max_progress = max_prog
+            task.completed = False
+            task.xp_reward = xp
+            task.coin_reward = coins
+            task.task_date = today
             db.session.add(task)
         
         db.session.commit()
@@ -210,13 +211,12 @@ class GameLogic:
             ]
             
             for name, item_type, price, effect, desc in shop_items:
-                item = ShopItem(
-                    name=name,
-                    item_type=item_type,
-                    price=price,
-                    effect=effect,
-                    description=desc
-                )
+                item = ShopItem()
+                item.name = name
+                item.item_type = item_type
+                item.price = price
+                item.effect = effect
+                item.description = desc
                 db.session.add(item)
             
             db.session.commit()

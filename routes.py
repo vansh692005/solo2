@@ -43,10 +43,9 @@ def register():
             return render_template('register.html')
         
         # Create new user
-        user = User(
-            email=email,
-            name=name
-        )
+        user = User()
+        user.email = email
+        user.name = name
         user.set_password(password)
         
         db.session.add(user)
@@ -366,14 +365,13 @@ def api_buy_item(item_id):
     if existing_item:
         existing_item.quantity += 1
     else:
-        new_item = InventoryItem(
-            user_id=user.id,
-            name=shop_item.name,
-            item_type=shop_item.item_type,
-            quantity=1,
-            effect=shop_item.effect,
-            value=shop_item.price
-        )
+        new_item = InventoryItem()
+        new_item.user_id = user.id
+        new_item.name = shop_item.name
+        new_item.item_type = shop_item.item_type
+        new_item.quantity = 1
+        new_item.effect = shop_item.effect
+        new_item.value = shop_item.price
         db.session.add(new_item)
     
     db.session.commit()
@@ -395,12 +393,45 @@ def api_achievements():
             'name': achievement.name,
             'description': achievement.description,
             'unlocked': achievement.unlocked,
+            'claimed': achievement.claimed,
             'unlock_date': achievement.unlock_date.isoformat() if achievement.unlock_date else None,
             'reward_xp': achievement.reward_xp,
             'reward_coins': achievement.reward_coins
         })
     
     return jsonify(achievement_data)
+
+@app.route('/api/claim-achievement/<int:achievement_id>', methods=['POST'])
+def api_claim_achievement(achievement_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    user = User.query.get(session['user_id'])
+    achievement = Achievement.query.filter_by(id=achievement_id, user_id=user.id).first()
+    
+    if not achievement:
+        return jsonify({'error': 'Achievement not found'}), 404
+    
+    if not achievement.unlocked:
+        return jsonify({'error': 'Achievement not unlocked yet'}), 400
+    
+    if achievement.claimed:
+        return jsonify({'error': 'Achievement already claimed'}), 400
+    
+    # Claim the achievement
+    achievement.claimed = True
+    
+    # Add rewards to player
+    player_data = user.player_data
+    player_data.coins += achievement.reward_coins
+    GameLogic.add_xp(player_data, achievement.reward_xp)
+    
+    db.session.commit()
+    
+    return jsonify({
+        'success': True, 
+        'message': f'Achievement claimed! +{achievement.reward_xp} XP, +{achievement.reward_coins} coins'
+    })
 
 @app.route('/api/personal-quests')
 def api_personal_quests():
@@ -443,14 +474,13 @@ def api_add_personal_quest():
     if quest_count >= 10:
         return jsonify({'error': 'You can only have 10 active personal quests'}), 400
     
-    quest = PersonalQuest(
-        user_id=user.id,
-        name=name,
-        description=description,
-        completed=False,
-        reward_xp=50,
-        reward_coins=25
-    )
+    quest = PersonalQuest()
+    quest.user_id = user.id
+    quest.name = name
+    quest.description = description
+    quest.completed = False
+    quest.reward_xp = 50
+    quest.reward_coins = 25
     
     db.session.add(quest)
     db.session.commit()
