@@ -92,10 +92,9 @@ def api_player():
         return jsonify({'error': 'Not authenticated'}), 401
     
     user = User.query.get(session['user_id'])
-    if not user or not user.player_data:
+    player = PlayerData.query.filter_by(user_id=user.id).first()
+    if not user or not player:
         return jsonify({'error': 'Player data not found'}), 404
-    
-    player = user.player_data
     return jsonify({
         'name': player.name,
         'level': player.level,
@@ -136,9 +135,10 @@ def api_daily_tasks():
             'coin_reward': task.coin_reward
         })
     
+    player_data = PlayerData.query.filter_by(user_id=user.id).first()
     return jsonify({
         'tasks': task_data,
-        'streak': user.player_data.daily_streak if user.player_data else 0
+        'streak': player_data.daily_streak if player_data else 0
     })
 
 @app.route('/api/complete-task/<int:task_id>', methods=['POST'])
@@ -159,7 +159,10 @@ def api_complete_task(task_id):
     task.progress = task.max_progress
     
     # Add rewards and check for level up
-    player_data = user.player_data
+    player_data = PlayerData.query.filter_by(user_id=user.id).first()
+    if not player_data:
+        return jsonify({'error': 'Player data not found'}), 404
+    
     old_level = player_data.level
     player_data.coins += task.coin_reward
     GameLogic.add_xp(player_data, task.xp_reward)
@@ -436,7 +439,10 @@ def api_claim_achievement(achievement_id):
     achievement.claimed = True
     
     # Add rewards to player
-    player_data = user.player_data
+    player_data = PlayerData.query.filter_by(user_id=user.id).first()
+    if not player_data:
+        return jsonify({'error': 'Player data not found'}), 404
+    
     player_data.coins += achievement.reward_coins
     GameLogic.add_xp(player_data, achievement.reward_xp)
     
@@ -517,14 +523,31 @@ def api_complete_personal_quest(quest_id):
     
     quest.completed = True
     
-    # Add rewards
-    player_data = user.player_data
+    # Add rewards and check for level up
+    player_data = PlayerData.query.filter_by(user_id=user.id).first()
+    if not player_data:
+        return jsonify({'error': 'Player data not found'}), 404
+    
+    old_level = player_data.level
     player_data.coins += quest.reward_coins
     GameLogic.add_xp(player_data, quest.reward_xp)
+    new_level = player_data.level
     
     db.session.commit()
     
-    return jsonify({'success': True, 'message': f'Quest completed! +{quest.reward_xp} XP, +{quest.reward_coins} coins'})
+    # Check if player leveled up
+    level_up = new_level > old_level
+    
+    response_data = {
+        'success': True, 
+        'message': f'Quest completed! +{quest.reward_xp} XP, +{quest.reward_coins} coins',
+        'level_up': level_up
+    }
+    
+    if level_up:
+        response_data['new_level'] = new_level
+    
+    return jsonify(response_data)
 
 @app.route('/api/delete-personal-quest/<int:quest_id>', methods=['DELETE'])
 def api_delete_personal_quest(quest_id):

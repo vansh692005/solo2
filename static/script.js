@@ -619,7 +619,13 @@ class Game {
             const result = await response.json();
 
             if (response.ok && result.success) {
-                this.showNotification(result.message, 'success');
+                // Check for level up and show animation
+                if (result.level_up && result.new_level) {
+                    this.showLevelUpAnimation(result.new_level);
+                    this.showNotification(`Level up! You are now Level ${result.new_level}!`, 'success');
+                } else {
+                    this.showNotification(result.message, 'success');
+                }
                 await this.loadPersonalQuests();
                 await this.loadPlayer();
             } else {

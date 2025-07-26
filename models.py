@@ -15,7 +15,7 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationships
-    player_data = db.relationship('PlayerData', backref='user', uselist=False, cascade='all, delete-orphan')
+    player_data = db.relationship('PlayerData', backref='user', uselist=False, cascade='all, delete-orphan', lazy='select')
     daily_tasks = db.relationship('DailyTask', backref='user', cascade='all, delete-orphan')
     quests = db.relationship('Quest', backref='user', cascade='all, delete-orphan')
     inventory_items = db.relationship('InventoryItem', backref='user', cascade='all, delete-orphan')
