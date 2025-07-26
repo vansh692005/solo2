@@ -1,0 +1,332 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solo Leveler</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <div class="header">
+            <div class="premium-logo">
+                <div class="logo-icon">👑</div>
+                <div class="logo-text">SOLO</div>
+                <div class="logo-subtitle">LEVELER</div>
+            </div>
+            
+            <div class="level-bar">
+                <span class="level-text">LVL: <span id="playerLevel">0</span></span>
+                <div class="xp-bar">
+                    <div class="xp-progress" id="xpProgress" style="width: 0%"></div>
+                </div>
+                <span class="xp-text" id="xpText">0/100</span>
+            </div>
+            
+            <div class="player-name" id="playerName">NEW HUNTER</div>
+            
+            <div class="currency-display">
+                <div class="coins">
+                    <span>💰</span>
+                    <span id="playerCoins">100</span>
+                </div>
+                <div class="energy">
+                    <span>⚡</span>
+                    <span id="playerEnergy">100/100</span>
+                </div>
+            </div>
+
+            <div class="logout-btn">
+                <a href="{{ url_for('logout') }}" class="logout-link">LOGOUT</a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Daily Tasks Screen -->
+            <div id="daily-tasks" class="screen active">
+                <div class="screen-header">
+                    <h1>DAILY TASKS</h1>
+                    <div class="streak-counter">
+                        <div class="streak-number" id="streakNumber">1</div>
+                        <div class="streak-text">STREAK</div>
+                    </div>
+                </div>
+                
+                <div class="subtitle">COMPLETE ALL TASKS TO MAINTAIN YOUR STREAK</div>
+                
+                <div class="quest-info-panel">
+                    <div class="panel-header">
+                        <span>❌</span>
+                        DAILY QUEST INFO
+                    </div>
+                    
+                    <div class="task-list" id="taskList">
+                        <!-- Tasks will be loaded here -->
+                    </div>
+                    
+                    <div class="timer" id="timer">TIME REMAINING: 08:28:04</div>
+                </div>
+            </div>
+
+            <!-- Status Screen -->
+            <div id="status" class="screen">
+                <div class="screen-header">
+                    <h1>STATUS</h1>
+                </div>
+                
+                <div class="player-info">
+                    <div class="avatar">👤</div>
+                    <div class="player-details">
+                        <div><strong id="statusPlayerName">NEW HUNTER</strong></div>
+                        <div>Class: <span id="playerClass">BEGINNER</span></div>
+                        <div>Title: <span id="playerTitle">NEWBIE</span></div>
+                        <div>Rank: <span id="playerRank">E</span> - <span id="rankName">AWAKENED</span></div>
+                    </div>
+                    <div class="level-display">
+                        <div class="rank-badge rank-e" id="rankBadge">E</div>
+                        <div class="level-text">LEVEL</div>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat" onclick="game.allocateStat('strength')">
+                        <div>
+                            <div class="stat-icon">💪</div>
+                            <div class="stat-name">STR : 10</div>
+                        </div>
+                        <div class="stat-add">+</div>
+                    </div>
+                    
+                    <div class="stat" onclick="game.allocateStat('vitality')">
+                        <div>
+                            <div class="stat-icon">❤️</div>
+                            <div class="stat-name">VIT : 10</div>
+                        </div>
+                        <div class="stat-add">+</div>
+                    </div>
+                    
+                    <div class="stat" onclick="game.allocateStat('agility')">
+                        <div>
+                            <div class="stat-icon">🏃</div>
+                            <div class="stat-name">AGI : 10</div>
+                        </div>
+                        <div class="stat-add">+</div>
+                    </div>
+                    
+                    <div class="stat" onclick="game.allocateStat('intelligence')">
+                        <div>
+                            <div class="stat-icon">🧠</div>
+                            <div class="stat-name">INT : 10</div>
+                        </div>
+                        <div class="stat-add">+</div>
+                    </div>
+                    
+                    <div class="stat" onclick="game.allocateStat('perception')">
+                        <div>
+                            <div class="stat-icon">👁️</div>
+                            <div class="stat-name">PER : 10</div>
+                        </div>
+                        <div class="stat-add">+</div>
+                    </div>
+                    
+                    <div class="stat-points">
+                        <div class="plus-icon">➕</div>
+                        <div class="available-text">
+                            AVAILABLE<br>
+                            STAT POINTS
+                        </div>
+                        <div class="points-number">0</div>
+                    </div>
+                </div>
+                
+                <div class="additional-stats">
+                    <div>Physical Damage Reduction: <span id="physicalReduction">5%</span></div>
+                    <div>Magical Damage Reduction: <span id="magicalReduction">3%</span></div>
+                    <div>Total Experience: <span id="totalExperience">0</span></div>
+                    <div>Rank Score: <span id="rankScore">0</span></div>
+                </div>
+            </div>
+
+            <!-- Quests Screen -->
+            <div id="quests" class="screen">
+                <div class="screen-header">
+                    <h1>QUESTS</h1>
+                    <button class="leaderboard-btn" onclick="game.showLeaderboard()">LEADERBOARD</button>
+                </div>
+                
+                <div class="quest-grid">
+                    <div class="quest-card" id="strengthQuest">
+                        <div class="quest-icon">💪</div>
+                        <div class="quest-name">STRENGTH TRAINING</div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 0%"></div>
+                        </div>
+                        <div class="quest-reward">+200 XP, +100 💰</div>
+                        <div class="quest-count">0/100</div>
+                        <button class="complete-quest-btn" style="display: none;" onclick="game.completeQuest('strength_training')">COMPLETE</button>
+                    </div>
+                    
+                    <div class="quest-card" id="intelligenceQuest">
+                        <div class="quest-icon">🧠</div>
+                        <div class="quest-name">INTELLIGENCE</div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 0%"></div>
+                        </div>
+                        <div class="quest-reward">+200 XP, +100 💰</div>
+                        <div class="quest-count">0/100</div>
+                        <button class="complete-quest-btn" style="display: none;" onclick="game.completeQuest('intelligence')">COMPLETE</button>
+                    </div>
+                    
+                    <div class="quest-card" id="disciplineQuest">
+                        <div class="quest-icon">🎯</div>
+                        <div class="quest-name">DISCIPLINE</div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 0%"></div>
+                        </div>
+                        <div class="quest-reward">+250 XP, +150 💰</div>
+                        <div class="quest-count">0/100</div>
+                        <button class="complete-quest-btn" style="display: none;" onclick="game.completeQuest('discipline')">COMPLETE</button>
+                    </div>
+                    
+                    <div class="quest-card" id="spiritualQuest">
+                        <div class="quest-icon">🧘</div>
+                        <div class="quest-name">SPIRITUAL TRAINING</div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 0%"></div>
+                        </div>
+                        <div class="quest-reward">+220 XP, +120 💰</div>
+                        <div class="quest-count">0/100</div>
+                        <button class="complete-quest-btn" style="display: none;" onclick="game.completeQuest('spiritual_training')">COMPLETE</button>
+                    </div>
+                    
+                    <div class="quest-card wide" id="secretQuest">
+                        <div class="quest-icon">🌟</div>
+                        <div class="quest-name">SECRET QUESTS</div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 0%"></div>
+                        </div>
+                        <div class="quest-reward">+1000 XP, +500 💰</div>
+                        <div class="quest-count">0/100</div>
+                        <button class="complete-quest-btn" style="display: none;" onclick="game.completeQuest('secret_quests')">COMPLETE</button>
+                    </div>
+                </div>
+                
+                <!-- Personal Quests Section -->
+                <div class="personal-quests-section">
+                    <h2>PERSONAL QUESTS</h2>
+                    
+                    <div class="add-quest-form">
+                        <input type="text" id="questName" placeholder="Quest Name" maxlength="50">
+                        <textarea id="questDescription" placeholder="Quest Description (optional)" maxlength="200"></textarea>
+                        <button class="add-quest-btn" onclick="game.addPersonalQuest()">ADD QUEST</button>
+                    </div>
+                    
+                    <div class="personal-quests-list" id="personalQuestsList">
+                        <!-- Personal quests will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory Screen -->
+            <div id="inventory" class="screen">
+                <div class="screen-header">
+                    <h1>INVENTORY</h1>
+                </div>
+                
+                <div class="inventory-grid" id="inventoryGrid">
+                    <!-- Inventory items will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Shop Screen -->
+            <div id="shop" class="screen">
+                <div class="screen-header">
+                    <h1>SHOP</h1>
+                </div>
+                
+                <div class="shop-grid" id="shopGrid">
+                    <!-- Shop items will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Achievements Screen -->
+            <div id="achievements" class="screen">
+                <div class="screen-header">
+                    <h1>ACHIEVEMENTS</h1>
+                </div>
+                
+                <div class="achievements-list" id="achievementsList">
+                    <!-- Achievements will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Leaderboard Screen -->
+            <div id="leaderboard" class="screen">
+                <div class="screen-header">
+                    <h1>LEADERBOARD</h1>
+                </div>
+                
+                <div class="leaderboard-stats">
+                    <div class="current-rank">
+                        <div class="rank-label">YOUR RANK</div>
+                        <div class="rank-number" id="currentRank">1</div>
+                    </div>
+                    <div class="total-players">
+                        <div class="players-label">TOTAL PLAYERS</div>
+                        <div class="players-number" id="totalPlayers">1</div>
+                    </div>
+                </div>
+                
+                <div class="leaderboard-list" id="leaderboardList">
+                    <!-- Leaderboard entries will be loaded here -->
+                </div>
+                
+                <button class="back-btn" onclick="game.showScreen('quests')">BACK TO QUESTS</button>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="game.showScreen('daily-tasks')">
+                <div class="nav-icon">📋</div>
+                <div class="nav-label">TASKS</div>
+            </div>
+            <div class="nav-item" onclick="game.showScreen('status')">
+                <div class="nav-icon">📊</div>
+                <div class="nav-label">STATUS</div>
+            </div>
+            <div class="nav-item" onclick="game.showScreen('quests')">
+                <div class="nav-icon">⚔️</div>
+                <div class="nav-label">QUESTS</div>
+            </div>
+            <div class="nav-item" onclick="game.showScreen('inventory')">
+                <div class="nav-icon">🎒</div>
+                <div class="nav-label">INVENTORY</div>
+            </div>
+            <div class="nav-item" onclick="game.showScreen('shop')">
+                <div class="nav-icon">🏪</div>
+                <div class="nav-label">SHOP</div>
+            </div>
+            <div class="nav-item" onclick="game.showScreen('achievements')">
+                <div class="nav-icon">🏆</div>
+                <div class="nav-label">AWARDS</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        // Initialize the game when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            window.game = new Game();
+        });
+    </script>
+</body>
+</html>
