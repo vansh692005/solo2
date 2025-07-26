@@ -697,7 +697,7 @@ class Game {
                     <div class="entry-rank ${player.position <= 3 ? 'top3' : ''}">${rankDisplay}</div>
                     <div class="entry-name">${player.name}</div>
                     <div class="entry-level">LVL ${player.level}</div>
-                    <div class="entry-rank-badge">${player.rank}</div>
+                    <div class="entry-position">#${player.position}</div>
                     <div class="entry-score">${player.rank_score}</div>
                     <div class="entry-streak">${player.daily_streak}</div>
                 `;
